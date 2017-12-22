@@ -1,0 +1,24 @@
+@import "node_modules/bootstrap/scss/bootstrap";
+
+form {
+    button,
+    select,
+    input {
+        width: 100%;
+    }
+}
+
+.todo-list {
+    padding: 15px;
+    [class^="col"],
+    [class*=' col'] {
+        padding: 1em;
+    }
+}
+
+.todo-element {
+    .done {
+        text-decoration: line-through;
+    }
+    border-bottom: 1px solid #e9e9e9;
+}
