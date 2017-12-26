@@ -18,5 +18,8 @@
     "mongojs": "^2.4.1",
     "mongoose": "^4.13.7",
     "request": "^2.83.0"
+  },
+  "devDependencies": {
+    "morgan": "^1.9.0"
   }
 }

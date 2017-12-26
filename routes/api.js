@@ -1,24 +1,24 @@
-const express = require('express');
-const router = express.Router();
+var express = require('express');
+var router = express.Router();
 
-const mongoose = require('mongoose');
+var mongoose = require('mongoose');
 mongoose.connect('mongodb://root:root@localhost:4001/test', {
     useMongoClient: true
 });
 
-const db = mongoose.connection;
+var db = mongoose.connection;
 
 db.on('error', function(err){
     console.log(err);
 })
 
-const request = require('request');
-const path = require('path');
+var request = require('request');
+var path = require('path');
 
-const appRoot = path.dirname(require.main.filename);
+var appRoot = path.dirname(require.main.filename);
 
 // Schemas
-const User = require(appRoot + '/lib/User');
+var User = require(appRoot + '/lib/User');
 
 router.get('/currencies', function(req, res, next){
     request({
@@ -30,8 +30,8 @@ router.get('/currencies', function(req, res, next){
 });
 
 router.post('/signin', function(req, res){
-    const username = req.body.username;
-    const password = req.body.password;
+    var username = req.body.username;
+    var password = req.body.password;
 
     User.findOne({
         username: username,
@@ -58,10 +58,10 @@ router.post('/signin', function(req, res){
 })
 
 router.post('/signup', function(req, res){
-    const username = req.body.username;
-    const password = req.body.password;
+    var username = req.body.username;
+    var password = req.body.password;
     
-    let newuser = new User();
+    var newuser = new User();
     newuser.username = username;
     newuser.password = password;
 
@@ -126,8 +126,8 @@ router.delete('/task/:id', function(req, res, next){
 
 // Update a task
 router.put('/task/:id', function(req, res, next){
-    const task = req.body;
-    const updTask = {};
+    var task = req.body;
+    var updTask = {};
 
     if(task.isDone){
         updTask.isDone = task.isDone;

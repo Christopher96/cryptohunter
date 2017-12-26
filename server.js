@@ -1,29 +1,27 @@
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
+var express = require('express');
+var path = require('path');
+var bodyParser = require('body-parser');
+var morgan = require('morgan');
 
-global.appRoot = path.resolve(__dirname);
+var api = require('./routes/api');
 
-const api = require('./routes/api');
+var port = 4000;
+var app = express();
 
-
-const port = 4000;
-
-const app = express();
-
-// View Engine
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.engine('html', require('ejs').renderFile);
-
-// Set static folder
-app.use(express.static(path.join(__dirname, 'client')));
+app.use(morgan('dev'));
 
 // Body parser middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
 }));
+
+app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/node_modules'));
+
+app.get('*', function(req, res){
+    res.sendFile(path.join(__dirname, '/public/app/index.html'));
+});
 
 app.use('/api', api);
 

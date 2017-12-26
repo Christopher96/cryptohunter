@@ -1,0 +1,65 @@
+@import "node_modules/bootstrap/scss/bootstrap";
+@import url('https://fonts.googleapis.com/css?family=Quicksand');
+
+$main_font: 'Quicksand';
+// $alt_font: 'Electrolize';
+
+body {
+    font-family: $main_font;
+}
+
+form {
+    button,
+    select,
+    input {
+        width: 100%;
+    }
+}
+
+.todo-list {
+    padding: 15px;
+    [class^="col"],
+    [class*=' col'] {
+        padding: 1em;
+    }
+}
+
+.todo-element {
+    .done {
+        text-decoration: line-through;
+    }
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.box {
+    background-color: $secondary;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.list {
+    padding-top: 20px;
+}
+
+.list-element {
+    padding-top: 10px;
+    button {
+        text-transform: uppercase;
+    }
+}
+
+.header-balance {
+    font-size: 1.8em;
+//    font-family: $alt_font;
+}
+
+.header-info {
+    span {
+        width: 100%;
+        text-align: right;
+    }
+    button {
+        margin-left: auto;
+        margin-right: 0;
+    }
+}
