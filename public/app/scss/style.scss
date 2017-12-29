@@ -39,6 +39,9 @@ form {
 
 .list {
     padding-top: 20px;
+    .row:first-of-type {
+        padding: 20px 0;
+    }
 }
 
 .list-element {
