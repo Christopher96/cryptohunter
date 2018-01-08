@@ -9,8 +9,6 @@ angular.module('userControllers', [])
     })
     .controller('homeCtrl', function($http, $scope, $location){
 
-        $scope.holdings = {};
-        $scope.coins = {};
         $scope.modal = {};
 
         $scope.tradeCoin = function(coin, sell = false) {
@@ -24,6 +22,8 @@ angular.module('userControllers', [])
             $scope.modal.holding = 0;
         }
 
+        $scope.coins = {};
+
         $scope.getCoins = function(){
             return new Promise(function(resolve, reject) {
                 $http.get('/api/coins').then(function(res){
@@ -36,8 +36,11 @@ angular.module('userControllers', [])
             });
         }
 
+        $scope.holdings = {};
+
         $scope.getHoldings = function(user_id){
-            $http.get('/api/holdings/'+user_id).then(function(res){
+            var data = {user_id: user_id};
+            $http.post('/api/holdings', data).then(function(res){
                 if(res.status == 200){
                     var holdings = res.data;
 
@@ -65,9 +68,10 @@ angular.module('userControllers', [])
         }
 
         $scope.refresh = function() {
+            $scope.getHoldings(123);
+            return;
             $scope.getCoins().then(function(coins) {
                 $scope.coins = coins;
-                $scope.getHoldings(123);
             });
         }
 

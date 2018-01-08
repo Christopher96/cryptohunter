@@ -44,7 +44,9 @@ router.get('/coins', function(req, res, next){
     });
 });
 
-router.get('/holdings/:user_id', function(req, res, next) {
+router.post('/holdings', function(req, res, next) {
+    console.log(req.params);
+    return;
     if(req.params.user_id) {
         Holding.find({user_id: req.params.user_id}, function(err, holdings) {
             if(!err) {

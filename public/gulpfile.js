@@ -6,7 +6,7 @@ var $ = gulpLoadPlugins();
 var reload = browserSync.reload;
 
 gulp.task('styles', () => {
-    return gulp.src('app/scss/*.scss')
+    gulp.src('app/scss/*.scss')
         .pipe($.sass.sync({
             outputStyle: 'expanded',
             precision: 10,
