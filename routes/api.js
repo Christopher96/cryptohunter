@@ -16,18 +16,18 @@ var request = require('request');
 var path = require('path');
 
 var appRoot = path.dirname(require.main.filename);
-var tickerURL = 'https://api.coinmarketcap.com/v1/ticker/';
+var tickerURL = 'https://api.coinmarketcap.com/v1/ticker';
 
 // Schemas
 var User = require(appRoot + '/lib/User');
 var Holding = require(appRoot + '/lib/Holding');
-
+//
 // var newholding = {
 //     user_id: '123',
 //     coin_id: 'bitcoin',
 //     holding: '123'
 // }
-//
+
 // var holding = new Holding(newholding);
 // holding.save();
 
@@ -44,57 +44,24 @@ router.get('/coins', function(req, res, next){
     });
 });
 
-router.get('/holdings', function(req, res, next) {
-    Holding.find(function(err, holdings) {
-        if(!err) {
-            var promises = [];
-            var newHoldings = [];
-            holdings.forEach(function(holding, i) {
-                var promise = getCoin(holding.coin_id).then(function(coin) {
-                    var newHolding = {
-                        name: coin.name,
-                        holding: holding.holding,
-                        symbol: coin.symbol,
-                        price_usd: coin.price_usd,
-                        percent_change_24h: coin.percent_change_24h
-                    }
-                    newHoldings.push (newHolding);
-                }).catch(function(error, remove = false) {
-                    if(remove) {
-                        Holding.remove(holding);
-                    }
-                    console.log(error);
+router.get('/holdings/:user_id', function(req, res, next) {
+    if(req.params.user_id) {
+        Holding.find({user_id: req.params.user_id}, function(err, holdings) {
+            if(!err) {
+                var newHoldings = [];
+                holdings.forEach(function(holding, i) {
+                    // delete holding._doc.__v;
+                    // delete holding._doc._id;
+                    newHoldings.push(holding._doc);
                 });
 
-                promises.push(promise);
-            });
-
-            Promise.all(promises).then(function() {
                 res.status(200).json(newHoldings);
-            });
-        }
-    });
-});
-
-function getCoin(coin_id) {
-    return new Promise(function(resolve, reject) {
-        request({
-            uri: tickerURL + '/' + coin_id,
-            method: 'GET',
-        }, function(error, response, body) {
-            if(!error && response.statusCode == 200){
-                body = JSON.parse(body);
-                if(!body.error) {
-                    resolve(body[0]);
-                } else {
-                    reject(body.error, true);
-                }
             } else {
-                reject(error);
+                console.log(err);
             }
         });
-    })
-}
+    }
+});
 
 router.post('/buy/:coin', function(req, res) {
 
