@@ -1,9 +1,8 @@
 @import "node_modules/bootstrap/scss/bootstrap";
+@import "node_modules/font-awesome/scss/font-awesome";
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
-
 $main_font: 'Quicksand';
 // $alt_font: 'Electrolize';
-
 body {
     font-family: $main_font;
 }
@@ -53,7 +52,7 @@ form {
 
 .header-balance {
     font-size: 1.8em;
-//    font-family: $alt_font;
+    //    font-family: $alt_font;
 }
 
 .header-info {

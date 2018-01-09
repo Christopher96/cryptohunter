@@ -1,26 +1,32 @@
 <div class="modal fade" id="trade_modal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-          <h5 class="modal-title">
-               <span>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <span>
                    {{(modal.sell) ? 'Sell' : 'Buy'}} {{modal.coin.symbol}}
                </span>
-                <span class="text-right" ng-class="modal.coin.percent_change_24h > 0 ? 'text-success' : 'text-danger'">{{modal.coin.percent_change_24h}}%</span>
-          </h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span class="text-right" ng-class="modal.coin.percent_change_24h > 0 ? 'text-success' : 'text-danger'">{{modal.coin.percent_change_24h}}%</span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-      </div>
-      <div class="modal-body">
-          <span>Holdings: {{modal.holding}} {{modal.coin.symbol}}</span>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn" ng-class="modal.sell ? 'btn-danger' : 'btn-success'">{{(modal.sell) ? "Sell" : "Buy"}}</button>
-      </div>
+            </div>
+            <div class="modal-body">
+                <span>Balance: ${{balance | nComma}}</span><br/>
+                <span>Holdings: {{modal.holding}} {{modal.coin.symbol}}</span><br/>
+                <span>Amount: </span><input type="number" min="0" ng-model="modal.amount" ng-change="tradeUpdate()"> <span>* {{modal.coin.price_usd}} = {{modal.trade_price | nComma}}</span><br/>
+                <a href="#" ng-click="tradeMax()">max</a> <a href="#" ng-click="tradeClear()">clear</a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn" ng-class="modal.sell ? 'btn-danger' : 'btn-success'" ng-click="makeTrade()">
+                    <span ng-show="!isTrading">{{(modal.sell) ? "Sell" : "Buy"}}</span>
+                    <span ng-show="isTrading"><i class="fa fa-circle-o-notch fa-spin"></i></span>
+                </button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 <div class="container mt-4">
     <div class="row box">
@@ -32,7 +38,7 @@
         <div class="col-6 header-balance">
             <div class="row">
                 <div class="col-6 text-right">Balance:</div>
-                <div class="col-6">$100,000,000</div>
+                <div class="col-6">${{balance | nComma}}</div>
             </div>
             <div class="row">
                 <div class="col-6 text-right">Net Worth:</div>
@@ -63,8 +69,7 @@
             <div class="col-2">${{holding.coin.price_usd | nComma}}</div>
             <div class="col-1 text-right" ng-class="holding.coin.percent_change_24h > 0 ? 'text-success' : 'text-danger'">{{holding.coin.percent_change_24h}}%</div>
             <div class="col-1">
-                <button class="btn btn-danger" ng-click="tradeCoin(holding.coin)" data-toggle="modal" data-target="#trade_modal">Sell</button>
-
+                <button class="btn btn-danger" ng-click="tradeCoin(holding.coin, true)" data-toggle="modal" data-target="#trade_modal">Sell</button>
             </div>
         </div>
     </div>
@@ -91,4 +96,4 @@
             </div>
         </div>
     </div>
-</div>          
+</div>

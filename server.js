@@ -21,11 +21,10 @@ app.use('/api', api);
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/node_modules'));
 
-app.get('*', function(req, res){
+app.get('*', function(req, res) {
     res.sendFile(path.join(__dirname, '/public/app/index.html'));
 });
 
-
-app.listen(port, function(){
+app.listen(port, function() {
     console.log("Started server at port ", port);
 });

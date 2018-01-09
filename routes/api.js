@@ -8,7 +8,7 @@ mongoose.connect('mongodb://root:root@localhost:4001/test', {
 
 var db = mongoose.connection;
 
-db.on('error', function(err){
+db.on('error', function(err) {
     console.log(err);
 })
 
@@ -25,18 +25,18 @@ var Holding = require(appRoot + '/lib/Holding');
 // var newholding = {
 //     user_id: '123',
 //     coin_id: 'bitcoin',
-//     holding: '123'
+//     holding: '1.5'
 // }
 
 // var holding = new Holding(newholding);
 // holding.save();
 
-router.get('/coins', function(req, res, next){
+router.get('/coins', function(req, res, next) {
     request({
         uri: tickerURL + '?limit=10',
         method: 'GET',
     }, function(error, response, body) {
-        if(!error && response.statusCode == 200){
+        if (!error && response.statusCode == 200) {
             return res.status(200).json(JSON.parse(body));
         } else {
             console.log(error);
@@ -45,11 +45,9 @@ router.get('/coins', function(req, res, next){
 });
 
 router.post('/holdings', function(req, res, next) {
-    console.log(req.params);
-    return;
-    if(req.params.user_id) {
-        Holding.find({user_id: req.params.user_id}, function(err, holdings) {
-            if(!err) {
+    if (req.body.user_id) {
+        Holding.find({ user_id: req.body.user_id }, function(err, holdings) {
+            if (!err) {
                 var newHoldings = [];
                 holdings.forEach(function(holding, i) {
                     // delete holding._doc.__v;
@@ -69,25 +67,26 @@ router.post('/buy/:coin', function(req, res) {
 
 });
 
-router.post('/signin', function(req, res){
+router.post('/signin', function(req, res) {
     var username = req.body.username;
     var password = req.body.password;
+    console.log(req.body);
 
     User.findOne({
         username: username,
         password: password
-    }, function(err, user){
-        if(err){
+    }, function(err, user) {
+        if (err) {
             console.log(err);
             return res.status(500).send();
         }
 
-        if(!user){
+        if (!user) {
             return res.status(404).send();
         }
 
-        User.update(user, {$set: {last_signin: Date.now()}}, function(err, user){
-            if(err) {
+        User.update(user, { $set: { last_signin: Date.now() } }, function(err, user) {
+            if (err) {
                 console.log(err);
                 return res.status(500).send();
             }
@@ -97,7 +96,7 @@ router.post('/signin', function(req, res){
     });
 })
 
-router.post('/signup', function(req, res){
+router.post('/signup', function(req, res) {
     var username = req.body.username;
     var password = req.body.password;
 
@@ -105,8 +104,8 @@ router.post('/signup', function(req, res){
     newuser.username = username;
     newuser.password = password;
 
-    newuser.save(function(err, savedUser){
-        if(err){
+    newuser.save(function(err, savedUser) {
+        if (err) {
             console.log(err);
             return res.status(500).send();
         }
@@ -117,9 +116,9 @@ router.post('/signup', function(req, res){
 
 
 // Get all tasks
-router.get('/tasks', function(req, res, next){
-    db.tasks.find(function(err, tasks){
-        if(err){
+router.get('/tasks', function(req, res, next) {
+    db.tasks.find(function(err, tasks) {
+        if (err) {
             res.send(err);
         }
         res.json(tasks);
@@ -127,9 +126,9 @@ router.get('/tasks', function(req, res, next){
 });
 
 // Get single task
-router.get('/task/:id', function(req, res, next){
-    db.tasks.findOne({_id: mongojs.ObjectId(req.params.id)}, function(err, task){
-        if(err){
+router.get('/task/:id', function(req, res, next) {
+    db.tasks.findOne({ _id: mongojs.ObjectId(req.params.id) }, function(err, task) {
+        if (err) {
             res.send(err);
         }
         res.json(task);
@@ -137,16 +136,16 @@ router.get('/task/:id', function(req, res, next){
 });
 
 // Save a task
-router.post('/task', function(req, res, next){
+router.post('/task', function(req, res, next) {
     var task = req.body;
-    if(!task.title || !(task.isDone + '')){
+    if (!task.title || !(task.isDone + '')) {
         res.status(400);
         res.json({
             "error": "Bad Data"
         });
     } else {
-        db.tasks.save(task, function(err, task){
-            if(err){
+        db.tasks.save(task, function(err, task) {
+            if (err) {
                 res.send(err);
             }
             res.json(task);
@@ -155,9 +154,9 @@ router.post('/task', function(req, res, next){
 });
 
 // Delete a task
-router.delete('/task/:id', function(req, res, next){
-    db.tasks.remove({_id: mongojs.ObjectId(req.params.id)}, function(err, task){
-        if(err){
+router.delete('/task/:id', function(req, res, next) {
+    db.tasks.remove({ _id: mongojs.ObjectId(req.params.id) }, function(err, task) {
+        if (err) {
             res.send(err);
         }
         res.json(task);
@@ -165,26 +164,26 @@ router.delete('/task/:id', function(req, res, next){
 });
 
 // Update a task
-router.put('/task/:id', function(req, res, next){
+router.put('/task/:id', function(req, res, next) {
     var task = req.body;
     var updTask = {};
 
-    if(task.isDone){
+    if (task.isDone) {
         updTask.isDone = task.isDone;
     }
 
-    if(task.title){
+    if (task.title) {
         updTask.title = task.title;
     }
 
-    if(!updTask){
+    if (!updTask) {
         res.status(400);
         res.json({
             "error": "Bad Data"
         })
     } else {
-        db.tasks.update({_id: mongojs.ObjectId(req.params.id)}, updTask, {}, function(err, task){
-            if(err){
+        db.tasks.update({ _id: mongojs.ObjectId(req.params.id) }, updTask, {}, function(err, task) {
+            if (err) {
                 res.send(err);
             }
             res.json(task);
