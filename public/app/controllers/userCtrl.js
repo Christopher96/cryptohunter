@@ -1,5 +1,5 @@
 angular.module('userControllers', [])
-    .config(function() {})
+    .config(() => {})
     .controller('signUpCtrl', function() {
         console.log('signup');
     })
@@ -8,45 +8,61 @@ angular.module('userControllers', [])
     })
     .controller('homeCtrl', function($http, $scope, $location) {
 
-        $scope.balance = 1000;
+        $scope.user = null;
+
+        $scope.canTrade = false;
         $scope.isTrading = false;
+        $scope.isSelling = false;
 
         $scope.modal = {};
 
-        $scope.tradeCoin = function(coin, sell = false) {
+        $scope.tradeCoin = (coin, sell = false) => {
+            $scope.isSelling = sell;
             $scope.modal.coin = coin;
-            $scope.modal.sell = sell;
-            $scope.modal.holding = 0;
+            $scope.modal.holding_amount = 0;
 
             var holding = $scope.findHolding(coin.id);
             if (holding) {
-                $scope.modal.holding = holding.holding;
+                $scope.modal.holding_amount = holding.amount;
             }
+
+            $scope.tradeClear();
         }
 
-        $scope.tradeUpdate = function() {
+        $scope.tradeUpdate = () => {
             $scope.modal.trade_price = $scope.modal.amount * $scope.modal.coin.price_usd;
+
+            if ($scope.isSelling) {
+                $scope.canTrade = !$scope.isTrading &&
+                    $scope.modal.trade_price > 0;
+            } else {
+                $scope.canTrade = !$scope.isTrading &&
+                    $scope.user.balance_usd >= $scope.modal.trade_price &&
+                    $scope.modal.trade_price > 0;
+            }
         }
 
-        $scope.tradeMax = function() {
-            if ($scope.modal.sell) {
-                $scope.modal.amount = $scope.modal.holding;
+        $scope.tradeMax = () => {
+            if ($scope.isSelling) {
+                $scope.modal.amount = $scope.modal.holding_amount;
             } else {
-                $scope.modal.amount = $scope.balance / $scope.modal.coin.price_usd;
+                $scope.modal.amount = $scope.user.balance_usd / $scope.modal.coin.price_usd;
             }
+            var pow = Math.pow(10, 10);
+            $scope.modal.amount = Math.floor($scope.modal.amount * pow) / pow;
             $scope.tradeUpdate();
         }
 
-        $scope.tradeClear = function() {
+        $scope.tradeClear = () => {
             $scope.modal.amount = 0;
             $scope.tradeUpdate();
         }
 
         $scope.coins = {};
 
-        $scope.getCoins = function() {
-            return new Promise(function(resolve, reject) {
-                $http.get('/api/coins').then(function(res) {
+        $scope.getCoins = () => {
+            return new Promise((resolve, reject) => {
+                $http.get('/api/coins').then((res) => {
                     if (res.status == 200) {
                         resolve(res.data);
                     } else {
@@ -56,52 +72,89 @@ angular.module('userControllers', [])
             });
         }
 
-        $scope.makeTrade = function() {
-            $scope.isTrading = !$scope.isTrading;
+        $scope.makeTrade = () => {
+            $scope.isTrading = true;
+
+            if ($scope.isSelling) {
+                $scope.post('/api/sell', {
+                    coin_id: $scope.modal.coin.id,
+                    amount: $scope.modal.amount
+                }).then((res) => {
+                    $scope.refresh().then(function() {
+                        $scope.isTrading = false;
+                    });
+                });
+            } else {
+                $scope.post('/api/buy', {
+                    coin_id: $scope.modal.coin.id,
+                    amount: $scope.modal.amount
+                }).then((res) => {
+                    $scope.refresh().then(function() {
+                        $scope.isTrading = false;
+                    });
+                });
+            }
         }
 
         $scope.holdings = {};
+        $scope.net_worth = 0;
 
-        $scope.getHoldings = function(user_id) {
-            var req = {
-                method: 'POST',
-                url: '/api/holdings',
-                headers: {
-                    'Content-Type': "application/json"
-                },
-                data: { user_id: user_id }
-            }
-            $http(req).then(function(res) {
-                if (res.status == 200) {
-                    var holdings = res.data;
+        $scope.getHoldings = () => {
+            return new Promise((resolve, reject) => {
+                $scope.post(
+                    '/api/holdings'
+                ).then((res) => {
+                    if (res.status == 200) {
+                        var holdings = res.data;
+                        $scope.net_worth = 0;
+                        for (var i = 0; i < holdings.length; i++) {
+                            var holding = holdings[i];
+                            holding.coin = $scope.findCoin(holding.coin_id);
 
-                    for (var i = 0; i < holdings.length; i++) {
-                        var holding = holdings[i];
-                        holding.coin = $scope.findCoin(holding.coin_id);
+                            if (holding.coin) {
+                                holding.worth = (holding.coin.price_usd * holding.amount);
+                                $scope.net_worth += holding.worth;
 
-                        if (holding.coin) {
-                            holding.worth = (parseInt(holding.coin.price_usd) * parseInt(holding.holding));
-                        } else {
-                            delete holdings[i];
+                                if ($scope.modal.coin) {
+                                    if ($scope.modal.coin.id == holding.coin.id) {
+                                        $scope.modal.coin = holding.coin;
+                                    }
+                                }
+
+                            } else {
+                                delete holdings[i];
+                            }
+
+                            holdings[i] = holding;
                         }
+                        $scope.net_worth += $scope.user.balance_usd;
+                        $scope.holdings = holdings;
 
-                        holdings[i] = holding;
+                        resolve();
+                    } else {
+                        reject();
                     }
-                    $scope.holdings = holdings;
-                }
+                });
             });
         }
 
-        $scope.refresh = function() {
-            $scope.getCoins().then(function(coins) {
-                $scope.coins = coins;
-                $scope.getHoldings(123);
+
+        $scope.signIn = (username, password) => {
+            return new Promise((resolve, reject) => {
+                $scope.post('/api/signin', {
+                    username: username,
+                    password: password
+                }).then((res) => {
+                    if (res.status == 200) {
+                        resolve(res.data);
+                    } else {
+                        reject();
+                    }
+                })
             });
         }
 
-        $scope.refresh();
-
-        $scope.findCoin = function(coin_id) {
+        $scope.findCoin = (coin_id) => {
             for (i in $scope.coins) {
                 var coin = $scope.coins[i];
                 if (coin.id == coin_id) {
@@ -111,7 +164,7 @@ angular.module('userControllers', [])
             return false;
         }
 
-        $scope.findHolding = function(coin_id) {
+        $scope.findHolding = (coin_id) => {
             for (i in $scope.holdings) {
                 var holding = $scope.holdings[i];
                 if (holding.coin_id == coin_id) {
@@ -122,4 +175,34 @@ angular.module('userControllers', [])
             return false;
         }
 
+        $scope.post = (action, data = {}) => {
+            if ($scope.user) {
+                data.user_id = $scope.user._id;
+            }
+
+            var req = {
+                method: 'POST',
+                url: action,
+                headers: {
+                    'Content-Type': "application/json"
+                },
+                data: data
+            }
+            return $http(req);
+        }
+
+        $scope.refresh = () => {
+            return new Promise((resolve, reject) => {
+                $scope.signIn("123", "123")
+                    .then((user) => {
+                        $scope.user = user;
+                        return $scope.getCoins();
+                    }).then((coins) => {
+                        $scope.coins = coins;
+                        return $scope.getHoldings();
+                    }).then(resolve);
+            });
+        }
+
+        $scope.refresh();
     });

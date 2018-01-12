@@ -25,6 +25,8 @@ app.get('*', function(req, res) {
     res.sendFile(path.join(__dirname, '/public/app/index.html'));
 });
 
-app.listen(port, function() {
-    console.log("Started server at port ", port);
+app.listen(port, 'localhost');
+
+app.on('listening', function() {
+    console.log('Express server started on port %s at %s', server.address().port, server.address().address);
 });
