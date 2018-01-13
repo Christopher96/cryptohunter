@@ -14,7 +14,7 @@
             </div>
             <div class="modal-body">
                 <span>Balance: ${{user.balance_usd | nComma}}</span><br/>
-                <span>Holdings: {{modal.holding_amount}} {{modal.coin.symbol}}</span><br/>
+                <span>Holdings: {{modal.holding.amount || 0}} {{modal.coin.symbol}}</span><br/>
                 <span>Amount: </span><input type="number" min="0" ng-model="modal.amount" ng-change="tradeUpdate()"> <span>* {{modal.coin.price_usd}} = {{modal.trade_price | nComma}}</span><br/>
                 <a href="#" ng-click="tradeMax()">max</a> <a href="#" ng-click="tradeClear()">clear</a>
             </div>

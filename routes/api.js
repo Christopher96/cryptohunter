@@ -62,7 +62,7 @@ getCoin = (coin_id) => {
     });
 }
 
-initTrade = (req) => {
+initTrade = (req, res) => {
     if (req.body.coin_id, req.body.user_id && req.body.amount) {
         return getUser(req.body.user_id).then((user) => {
             this.user = user;
@@ -70,15 +70,19 @@ initTrade = (req) => {
         }).then((coin) => {
             this.coin = coin;
             this.tradePrice = this.coin.price_usd * req.body.amount;
-            var decimalPlaces = 3;
-            var pow = Math.pow(10, decimalPlaces);
-            this.tradePrice = Math.round(this.tradePrice * pow) / pow;
+            if(this.tradePrice >= 1) {
+                var decimalPlaces = 3;
+                var pow = Math.pow(10, decimalPlaces);
+                this.tradePrice = Math.round(this.tradePrice * pow) / pow;
 
-            return Holding.findOne({
-                user_id: req.body.user_id,
-                coin_id: this.coin.id
-            })
+                return Holding.findOne({
+                    user_id: req.body.user_id,
+                    coin_id: this.coin.id
+                });
+            }
         })
+    } else {
+        res.status(500).send();
     }
 }
 
@@ -112,7 +116,7 @@ router.post('/holdings', (req, res, next) => {
 });
 
 router.post('/buy', (req, res) => {
-    initTrade(req).then((holding) => {
+    initTrade(req, res).then((holding) => {
         if (this.user.balance_usd >= this.tradePrice) {
             this.user.balance_usd -= this.tradePrice;
             this.user.save();
@@ -128,7 +132,7 @@ router.post('/buy', (req, res) => {
                 holding.save();
             }
 
-            return res.status(200).send();
+            return res.status(200).json(this.user.balance_usd);
         }
 
         return res.status(406).send();
@@ -137,7 +141,7 @@ router.post('/buy', (req, res) => {
 
 
 router.post('/sell', (req, res) => {
-    initTrade(req).then((holding) => {
+    initTrade(req, res).then((holding) => {
         if (holding) {
             if (holding.amount >= req.body.amount) {
                 this.user.balance_usd += this.tradePrice;
@@ -145,12 +149,13 @@ router.post('/sell', (req, res) => {
 
                 this.user.save();
 
-                if (holding.amount * this.coin.price_usd < 1)
+                if (holding.amount * this.coin.price_usd < 1) {
                     holding.remove();
-                else
+                } else {
                     holding.save();
+                }
+                return res.status(200).json(this.user.balance_usd);
 
-                return res.status(200).send();
             }
         }
 
@@ -172,7 +177,7 @@ router.post('/signin', (req, res) => {
         }
 
         if (!user) {
-            return res.status(404).send();
+            return res.status(400).send();
         }
 
         user.last_signin = Date.now();

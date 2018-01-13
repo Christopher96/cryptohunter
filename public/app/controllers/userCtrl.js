@@ -19,11 +19,10 @@ angular.module('userControllers', [])
         $scope.tradeCoin = (coin, sell = false) => {
             $scope.isSelling = sell;
             $scope.modal.coin = coin;
-            $scope.modal.holding_amount = 0;
 
             var holding = $scope.findHolding(coin.id);
             if (holding) {
-                $scope.modal.holding_amount = holding.amount;
+                $scope.modal.holding = holding;
             }
 
             $scope.tradeClear();
@@ -44,7 +43,7 @@ angular.module('userControllers', [])
 
         $scope.tradeMax = () => {
             if ($scope.isSelling) {
-                $scope.modal.amount = $scope.modal.holding_amount;
+                $scope.modal.amount = $scope.modal.holding.amount;
             } else {
                 $scope.modal.amount = $scope.user.balance_usd / $scope.modal.coin.price_usd;
             }
@@ -80,18 +79,20 @@ angular.module('userControllers', [])
                     coin_id: $scope.modal.coin.id,
                     amount: $scope.modal.amount
                 }).then((res) => {
-                    $scope.refresh().then(function() {
-                        $scope.isTrading = false;
-                    });
+                    $scope.user.balance_usd = res.data;
+                    $scope.getHoldings();
+                    $scope.tradeClear();
+                    $scope.isTrading = false;
                 });
             } else {
                 $scope.post('/api/buy', {
                     coin_id: $scope.modal.coin.id,
                     amount: $scope.modal.amount
                 }).then((res) => {
-                    $scope.refresh().then(function() {
-                        $scope.isTrading = false;
-                    });
+                    $scope.user.balance_usd = res.data;
+                    $scope.getHoldings();
+                    $scope.tradeClear();
+                    $scope.isTrading = false;
                 });
             }
         }
@@ -107,6 +108,7 @@ angular.module('userControllers', [])
                     if (res.status == 200) {
                         var holdings = res.data;
                         $scope.net_worth = 0;
+
                         for (var i = 0; i < holdings.length; i++) {
                             var holding = holdings[i];
                             holding.coin = $scope.findCoin(holding.coin_id);
@@ -120,7 +122,6 @@ angular.module('userControllers', [])
                                         $scope.modal.coin = holding.coin;
                                     }
                                 }
-
                             } else {
                                 delete holdings[i];
                             }
