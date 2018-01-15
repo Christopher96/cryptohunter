@@ -45,7 +45,7 @@ gulp.task('serve', ['nodemon'], () => {
         open: false
     });
 
-    gulp.watch('app/scss/**/*.scss', ['styles']);
+    gulp.watch('public/app/scss/**/*.scss', ['styles']);
 
     gulp.watch([
         'public/**/*.html',
@@ -54,12 +54,12 @@ gulp.task('serve', ['nodemon'], () => {
 });
 
 gulp.task('styles', () => {
-    gulp.src('app/scss/*.scss')
+    gulp.src('public/app/scss/*.scss')
         .pipe($.sass.sync({
             outputStyle: 'expanded',
             precision: 10,
             includePaths: ['.']
         }).on('error', $.sass.logError))
-        .pipe(gulp.dest('app/css'))
+        .pipe(gulp.dest('public/app/css'))
         .pipe(reload({ stream: true }));
 });

@@ -71,14 +71,12 @@ initTrade = (req, res) => {
             this.coin = coin;
             this.tradePrice = this.coin.price_usd * req.body.amount;
             if(this.tradePrice >= 1) {
-                var decimalPlaces = 3;
-                var pow = Math.pow(10, decimalPlaces);
-                this.tradePrice = Math.round(this.tradePrice * pow) / pow;
-
                 return Holding.findOne({
                     user_id: req.body.user_id,
                     coin_id: this.coin.id
                 });
+            } else {
+                res.status(406).send();
             }
         })
     } else {
@@ -121,18 +119,21 @@ router.post('/buy', (req, res) => {
             this.user.balance_usd -= this.tradePrice;
             this.user.save();
 
+            var returnObj = {};
             if (!holding) {
                 var newHolding = new Holding();
                 newHolding.amount = req.body.amount;
                 newHolding.coin_id = req.body.coin_id;
                 newHolding.user_id = req.body.user_id;
                 newHolding.save();
+                returnObj.holding = newHolding;
             } else {
                 holding.amount += req.body.amount;
                 holding.save();
+                returnObj.holding = holding;
             }
-
-            return res.status(200).json(this.user.balance_usd);
+            returnObj.balance = this.user.balance_usd;
+            return res.status(200).json(returnObj);
         }
 
         return res.status(406).send();
@@ -154,12 +155,15 @@ router.post('/sell', (req, res) => {
                 } else {
                     holding.save();
                 }
-                return res.status(200).json(this.user.balance_usd);
+                return res.status(200).json({
+                    balance: this.user.balance_usd,
+                    holding: holding
+                });
 
             }
         }
 
-        return res.status(406).send();
+        return res.status(400).send();
     });
 });
 
