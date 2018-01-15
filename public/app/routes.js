@@ -6,13 +6,17 @@ angular.module('appRoutes', ['ngRoute'])
             controller: 'homeCtrl',
             controllerAs: 'home'
         })
+        .when('/signin', {
+            templateUrl: 'app/views/pages/login.html',
+            controller: 'signInCtrl',
+        })
         .when('/signup', {
-            templateUrl: 'app/views/pages/signup.html',
+            templateUrl: 'app/views/pages/login.html',
             controller: 'signUpCtrl',
         })
-        .when('/signin', {
-            templateUrl: 'app/views/pages/signin.html',
-            controller: 'signInCtrl',
+        .when('/signout', {
+            template: '',
+            controller: 'signOutCtrl',
         })
         .otherwise({
             redirectTo: '/'

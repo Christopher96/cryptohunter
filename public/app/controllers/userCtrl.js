@@ -1,21 +1,39 @@
-angular.module('userControllers', [])
+angular.module('userCtrl', [])
     .config(() => {
     })
-    .controller('signInCtrl', function($scope) {
+    .controller('signInCtrl', function($location, $scope, apiService) {
         $scope.showPassword = false;
+        $scope.tipTxt = 'Don\'t have a user?';
+        $scope.titleTxt = 'Sign in';
+        $scope.linkTxt = 'Sign up';
+        $scope.link = '/signup';
         $scope.signIn = () => {
-
+            $scope.signIn($scope.username, $scope.password).then(() => {
+                $location.path('/');
+            }).catch((message) => {
+                $scope.error = message;
+            })
         }
     })
-    .controller('signUpCtrl', function($scope) {
+    .controller('signUpCtrl', function($scope, apiService) {
         $scope.showPassword = false;
+        $scope.tipTxt = 'Already have a user?';
+        $scope.titleTxt = 'Sign up';
+        $scope.linkTxt = 'Sign in';
+        $scope.link = '/signin';
         $scope.signUp = () => {
-
+            $scope.signUp($scope.username, $scope.password).then(() => {
+                $location.path('/signin');
+            }).catch((message) => {
+                $scope.error = message;
+            })
         }
     })
-    .controller('homeCtrl', function($http, $scope, $location) {
-
-        $scope.user = null;
+    .controller('signOutCtrl', function($location, apiService) {
+        apiService.user = null;
+        $location.path('/signin');
+    })
+    .controller('homeCtrl', function($http, $scope, $location, apiService) {
 
         $scope.canTrade = false;
         $scope.isTrading = false;
@@ -46,7 +64,7 @@ angular.module('userControllers', [])
                     $scope.modal.trade_price >= 1;
             } else {
                 $scope.canTrade = !$scope.isTrading &&
-                    $scope.user.balance_usd >= $scope.modal.trade_price &&
+                    apiService.user.balance_usd >= $scope.modal.trade_price &&
                     $scope.modal.trade_price >= 1;
             }
         }
@@ -55,7 +73,7 @@ angular.module('userControllers', [])
             if ($scope.isSelling) {
                 $scope.modal.amount = $scope.modal.holding.amount;
             } else {
-                $scope.modal.amount = $scope.user.balance_usd / $scope.modal.coin.price_usd;
+                $scope.modal.amount = apiService.user.balance_usd / $scope.modal.coin.price_usd;
                 var pow = Math.pow(10, 5);
                 $scope.modal.amount = Math.floor($scope.modal.amount * pow) / pow;
             }
@@ -85,11 +103,11 @@ angular.module('userControllers', [])
             $scope.isTrading = true;
 
             if ($scope.isSelling) {
-                $scope.post('/api/sell', {
+                apiService.post('/api/sell', {
                     coin_id: $scope.modal.coin.id,
                     amount: $scope.modal.amount
                 }).then((res) => {
-                    $scope.user.balance_usd = res.data.balance;
+                    apiService.user.balance_usd = res.data.balance;
                     $scope.modal.holding = res.data.holding;
                     $scope.getHoldings();
                     $scope.tradeClear();
@@ -97,11 +115,11 @@ angular.module('userControllers', [])
                     $scope.isTrading = false;
                 });
             } else {
-                $scope.post('/api/buy', {
+                apiService.post('/api/buy', {
                     coin_id: $scope.modal.coin.id,
                     amount: $scope.modal.amount
                 }).then((res) => {
-                    $scope.user.balance_usd = res.data.balance;
+                    apiService.user.balance_usd = res.data.balance;
                     $scope.modal.holding = res.data.holding;
                     $scope.getHoldings();
                     $scope.tradeClear();
@@ -116,7 +134,7 @@ angular.module('userControllers', [])
 
         $scope.getHoldings = () => {
             return new Promise((resolve, reject) => {
-                $scope.post(
+                apiService.post(
                     '/api/holdings'
                 ).then((res) => {
                     if (res.status == 200) {
@@ -142,7 +160,7 @@ angular.module('userControllers', [])
 
                             holdings[i] = holding;
                         }
-                        $scope.net_worth += $scope.user.balance_usd;
+                        $scope.net_worth += apiService.user.balance_usd;
                         $scope.holdings = holdings;
 
                         resolve();
@@ -174,36 +192,6 @@ angular.module('userControllers', [])
             return false;
         }
 
-        $scope.signIn = (username, password) => {
-            return new Promise((resolve, reject) => {
-                $scope.post('/api/signin', {
-                    username: username,
-                    password: password
-                }).then((res) => {
-                    if (res.status == 200) {
-                        resolve(res.data);
-                    } else {
-                        reject();
-                    }
-                })
-            });
-        }
-
-        $scope.post = (action, data = {}) => {
-            if ($scope.user) {
-                data.user_id = $scope.user._id;
-            }
-
-            var req = {
-                method: 'POST',
-                url: action,
-                headers: {
-                    'Content-Type': "application/json"
-                },
-                data: data
-            }
-            return $http(req);
-        }
 
         $scope.refresh = () => {
             $scope.getCoins()
@@ -213,9 +201,9 @@ angular.module('userControllers', [])
                 });
         }
 
-        $scope.signIn("123", "123")
+        apiService.signIn("123", "123")
             .then((user) => {
-                $scope.user = user;
+                $scope.user = apiService.user;
                 setInterval($scope.refresh, 10000);
             })
 

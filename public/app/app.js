@@ -1,4 +1,4 @@
-angular.module('myapp', ['appRoutes', 'userControllers', 'apiService'])
+angular.module('myapp', ['appRoutes', 'userCtrl', 'userService'])
     .filter('nComma', function() {
         return function(x) {
             if (x != null)
