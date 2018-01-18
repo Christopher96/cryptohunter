@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="form-wrap">
-                    <h1>{{titleTxt}}</h1>
+                    <h1>Sign in</h1>
                     <div ng-show="error != null" class="alert alert-danger" role="alert">
                         <span class="fa fa-exclamation-circle"></span>
                         {{error}}
@@ -14,14 +14,17 @@
                             <input class="form-control" type="username" name="username" placeholder="Username" ng-model="username">
                         </div>
                         <div class="form-group">
-                            <label for="key" class="sr-only">Password</label>
-                            <input id="key" class="form-control" type="{{(showPassword) ? 'text' : 'password'}}" name="key" placeholder="Password" ng-model="password">
+                            <label for="password" class="sr-only">Password</label>
+                            <input id="password" class="form-control" type="{{(showPassword) ? 'text' : 'password'}}" name="password" placeholder="Password" ng-model="password">
                         </div>
                         <div class="checkbox" ng-class="{'show': showPassword}">
                             <span class="character-checkbox" ng-click="showPassword = !showPassword"></span>
                             <span class="label">Show password</span>
                         </div>
-                        <input type="submit" id="btn-login" class="btn btn-custom btn-lg btn-block" value="{{titleTxt}}">
+                        <button id="btn-login" class="btn btn-primary btn-block" type="submit" ng-disabled="isLoading">
+                            <span ng-show="!isLoading">Sign in</span>
+                            <i class="fa fa-spin fa-circle-o-notch" ng-show="isLoading"></i>
+                        </button>
                     </form>
                     <hr>
                 </div>
@@ -34,8 +37,8 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <p>{{tipTxt}}</p>
-                <p><a href="{{link}}">{{linkTxt}}</a></p>
+                <p>Don't have a user?</p>
+                <p><a href="/signup">Sign up</a></p>
             </div>
         </div>
     </div>

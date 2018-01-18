@@ -111,34 +111,34 @@ router.post('/holdings', (req, res, next) => {
 });
 
 router.post('/buy', (req, res) => {
-    if (req.body.coin_id, req.body.user_id && req.body.amount) {
-        initTrade(req, res).then((holding) => {
-            if (this.user.balance_usd >= this.tradePrice) {
-                this.user.balance_usd -= this.tradePrice;
-                this.user.save();
-
-                var returnObj = {};
-                if (!holding) {
-                    var newHolding = new Holding();
-                    newHolding.amount = req.body.amount;
-                    newHolding.coin_id = req.body.coin_id;
-                    newHolding.user_id = req.body.user_id;
-                    newHolding.save();
-                    returnObj.holding = newHolding;
-                } else {
-                    holding.amount += req.body.amount;
-                    holding.save();
-                    returnObj.holding = holding;
-                }
-                returnObj.balance = this.user.balance_usd;
-                return res.status(200).json(returnObj);
-            }
-
-            return res.status(406).send();
-        });
-    } else {
+    if (!req.body.coin_id || !req.body.user_id || !req.body.amount) {
         res.status(500).send();
     }
+
+    initTrade(req, res).then((holding) => {
+        if (this.user.balance_usd >= this.tradePrice) {
+            this.user.balance_usd -= this.tradePrice;
+            this.user.save();
+
+            var returnObj = {};
+            if (!holding) {
+                var newHolding = new Holding();
+                newHolding.amount = req.body.amount;
+                newHolding.coin_id = req.body.coin_id;
+                newHolding.user_id = req.body.user_id;
+                newHolding.save();
+                returnObj.holding = newHolding;
+            } else {
+                holding.amount += req.body.amount;
+                holding.save();
+                returnObj.holding = holding;
+            }
+            returnObj.balance = this.user.balance_usd;
+            return res.status(200).json(returnObj);
+        }
+
+        return res.status(406).send();
+    });
 });
 
 
@@ -176,17 +176,21 @@ router.post('/signin', (req, res) => {
     var username = req.body.username;
     var password = req.body.password;
 
+    if(!username || !password) {
+        return res.status(400).send('Fill in all fields.');
+    }
+
     User.findOne({
         username: username,
         password: password
     }, (err, user) => {
         if (err) {
-            console.log(err);
             return res.status(500).send();
+            console.log(err);
         }
 
         if (!user) {
-            return res.status(400).send();
+            return res.status(404).send('Wrong username or password.');
         }
 
         user.last_signin = Date.now();
@@ -204,6 +208,15 @@ router.post('/signin', (req, res) => {
 router.post('/signup', (req, res) => {
     var username = req.body.username;
     var password = req.body.password;
+    var confirmPassword = req.body.confirmPassword;
+
+    if(!username || !password || !confirmPassword) {
+        return res.status(400).send('Fill in all fields.');
+    }
+
+    if(password != confirmPassword) {
+        return res.status(401).send('Passwords does not match.');
+    }
 
     var newuser = new User();
     newuser.username = username;
@@ -213,11 +226,13 @@ router.post('/signup', (req, res) => {
 
     newuser.save((err, savedUser) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send();
+            if(err.code == 11000)
+                return res.status(402).send('User already exists.');
+            else 
+                return res.status(500).send();
         }
 
-        return res.status(200).send();
+        return res.status(200).send(newuser);
     })
 });
 

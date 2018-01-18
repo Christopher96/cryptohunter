@@ -1,39 +1,51 @@
 angular.module('userCtrl', [])
     .config(() => {
     })
-    .controller('signInCtrl', function($location, $scope, apiService) {
+    .controller('signInCtrl', function($window, $scope, apiService) {
         $scope.showPassword = false;
-        $scope.tipTxt = 'Don\'t have a user?';
-        $scope.titleTxt = 'Sign in';
-        $scope.linkTxt = 'Sign up';
-        $scope.link = '/signup';
+
         $scope.signIn = () => {
-            $scope.signIn($scope.username, $scope.password).then(() => {
-                $location.path('/');
+            $scope.isLoading = true;
+            apiService.signIn($scope.username, $scope.password).then(() => {
+                $window.location.href = '/';
             }).catch((message) => {
                 $scope.error = message;
-            })
+                $scope.$apply();
+            }).then(() => {
+                $scope.isLoading = false;
+                $scope.$apply();
+            });
         }
     })
-    .controller('signUpCtrl', function($scope, apiService) {
+    .controller('signUpCtrl', function($window, $scope, apiService) {
         $scope.showPassword = false;
-        $scope.tipTxt = 'Already have a user?';
-        $scope.titleTxt = 'Sign up';
-        $scope.linkTxt = 'Sign in';
-        $scope.link = '/signin';
+
         $scope.signUp = () => {
-            $scope.signUp($scope.username, $scope.password).then(() => {
-                $location.path('/signin');
+            $scope.isLoading = true;
+            apiService.signUp($scope.username, $scope.password, $scope.confirm_password).then(() => {
+                $window.location.href = '/';
             }).catch((message) => {
                 $scope.error = message;
+                $scope.$apply();
+            }).then(() => {
+                $scope.isLoading = false;
+                $scope.$apply();
             })
         }
     })
     .controller('signOutCtrl', function($location, apiService) {
-        apiService.user = null;
+        apiService.setUser('');
         $location.path('/signin');
     })
-    .controller('homeCtrl', function($http, $scope, $location, apiService) {
+    .controller('homeCtrl', function($http, $scope, $window, apiService) {
+        $scope.user = null;
+
+        if(apiService.getUser()) {
+            $scope.user = apiService.getUser();
+        } else {
+            apiService.setUser('');
+            $window.location.href = '/signin';
+        }
 
         $scope.canTrade = false;
         $scope.isTrading = false;
@@ -47,7 +59,6 @@ angular.module('userCtrl', [])
 
             var holding = $scope.findHolding(coin.id);
             if (holding) {
-                console.log(holding);
                 $scope.modal.holding = holding;
             } else {
                 $scope.modal.holding = null;
@@ -64,7 +75,7 @@ angular.module('userCtrl', [])
                     $scope.modal.trade_price >= 1;
             } else {
                 $scope.canTrade = !$scope.isTrading &&
-                    apiService.user.balance_usd >= $scope.modal.trade_price &&
+                    $scope.user.balance_usd >= $scope.modal.trade_price &&
                     $scope.modal.trade_price >= 1;
             }
         }
@@ -73,7 +84,7 @@ angular.module('userCtrl', [])
             if ($scope.isSelling) {
                 $scope.modal.amount = $scope.modal.holding.amount;
             } else {
-                $scope.modal.amount = apiService.user.balance_usd / $scope.modal.coin.price_usd;
+                $scope.modal.amount = $scope.user.balance_usd / $scope.modal.coin.price_usd;
                 var pow = Math.pow(10, 5);
                 $scope.modal.amount = Math.floor($scope.modal.amount * pow) / pow;
             }
@@ -107,7 +118,7 @@ angular.module('userCtrl', [])
                     coin_id: $scope.modal.coin.id,
                     amount: $scope.modal.amount
                 }).then((res) => {
-                    apiService.user.balance_usd = res.data.balance;
+                    $scope.user.balance_usd = res.data.balance;
                     $scope.modal.holding = res.data.holding;
                     $scope.getHoldings();
                     $scope.tradeClear();
@@ -119,7 +130,7 @@ angular.module('userCtrl', [])
                     coin_id: $scope.modal.coin.id,
                     amount: $scope.modal.amount
                 }).then((res) => {
-                    apiService.user.balance_usd = res.data.balance;
+                    $scope.user.balance_usd = res.data.balance;
                     $scope.modal.holding = res.data.holding;
                     $scope.getHoldings();
                     $scope.tradeClear();
@@ -160,14 +171,16 @@ angular.module('userCtrl', [])
 
                             holdings[i] = holding;
                         }
-                        $scope.net_worth += apiService.user.balance_usd;
+                        $scope.net_worth += $scope.user.balance_usd;
                         $scope.holdings = holdings;
 
                         resolve();
                     } else {
                         reject();
                     }
-                });
+                }).catch((res) => {
+                    console.log(res);
+                })
             });
         }
 
@@ -200,12 +213,6 @@ angular.module('userCtrl', [])
                     $scope.getHoldings();
                 });
         }
-
-        apiService.signIn("123", "123")
-            .then((user) => {
-                $scope.user = apiService.user;
-                setInterval($scope.refresh, 10000);
-            })
 
         $scope.refresh();
     });

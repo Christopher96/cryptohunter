@@ -7,11 +7,11 @@ angular.module('appRoutes', ['ngRoute'])
             controllerAs: 'home'
         })
         .when('/signin', {
-            templateUrl: 'app/views/pages/login.html',
+            templateUrl: 'app/views/pages/signin.html',
             controller: 'signInCtrl',
         })
         .when('/signup', {
-            templateUrl: 'app/views/pages/login.html',
+            templateUrl: 'app/views/pages/signup.html',
             controller: 'signUpCtrl',
         })
         .when('/signout', {

@@ -46,15 +46,17 @@
             </div>
         </div>
         <div class="col-3 header-info">
-            <div class="row"><span>Logged in as: syphez</span></div>
+            <div class="row"><span>Logged in as: {{user.username}}</span></div>
             <div class="row"><span>Last logged in: 2017-01-01</span></div>
-            <div class="row"><a href="/signout" class="btn btn-primary">Sign out</a></div>
+            <div class="row"><a href="/signout" id="logout" class="btn btn-primary">Sign out</a></div>
         </div>
     </div>
 
     <div class="portfolio list">
+        <hr>
         <h3>Portfolio</h3>
-        <div class="row bg-secondary">
+        <hr>
+        <div class="row">
             <div class="col-3">Name</div>
             <div class="col-2">Holdings</div>
             <div class="col-3">Worth ($)</div>
@@ -62,6 +64,7 @@
             <div class="col-2 text-right">Change (24h)</div>
             <div class="col-1 text-center">Trade</div>
         </div>
+        <hr>
         <div class="row list-element" ng-repeat="holding in holdings">
             <div class="col-3">{{holding.coin.name}}</div>
             <div class="col-2">{{holding.amount | nComma}}</div>
@@ -74,8 +77,10 @@
         </div>
     </div>
     <div class="currencies list">
+        <hr>
         <h3>Coins</h3>
-        <div class="row bg-secondary">
+        <hr>
+        <div class="row">
             <div class="col-1">Rank</div>
             <div class="col-2">Name</div>
             <div class="col-2">Marketcap</div>
@@ -84,6 +89,7 @@
             <div class="col-2 text-right">Change (24h)</div>
             <div class="col-1 text-center">Trade</div>
         </div>
+        <hr>
         <div class="row list-element" ng-repeat="coin in coins">
             <div class="col-1">{{coin.rank}}</div>
             <div class="col-2">{{coin.name}}</div>
