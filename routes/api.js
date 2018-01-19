@@ -5,15 +5,18 @@ var mongoose = require('mongoose');
 var ObjectId = require('mongoose').Types.ObjectId;
 
 var mongoUri = process.env.MONGODB_URI || 'mongodb://root:root@localhost:4001/test';
-mongoose.connect(mongoUri, {
-    useMongoClient: true
+var options = {
+    "mongos": {
+        "ssl": true,
+        "sslValidate": false,
+        "useMongoClient": true
+    }
+};
+mongoose.connect(mongoUri, options, function(err, db) {
+    if (err) {
+        console.log(err);
+    }
 });
-
-var db = mongoose.connection;
-
-db.on('error', function(err) {
-    console.log(err);
-})
 
 var request = require('request');
 var path = require('path');
