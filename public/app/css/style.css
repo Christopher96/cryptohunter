@@ -11109,6 +11109,11 @@ form input {
   width: 100%;
 }
 
+#logo {
+  width: 100%;
+  margin-left: -20px;
+}
+
 .box {
   padding: 10px;
   border-radius: 10px;

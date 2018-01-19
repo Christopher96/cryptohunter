@@ -69,7 +69,7 @@ initTrade = (req, res) => {
     }).then((coin) => {
         this.coin = coin;
         this.tradePrice = this.coin.price_usd * req.body.amount;
-        if(this.tradePrice >= 1) {
+        if (this.tradePrice >= 1) {
             return Holding.findOne({
                 user_id: req.body.user_id,
                 coin_id: this.coin.id
@@ -118,7 +118,6 @@ router.post('/buy', (req, res) => {
     initTrade(req, res).then((holding) => {
         if (this.user.balance_usd >= this.tradePrice) {
             this.user.balance_usd -= this.tradePrice;
-            this.user.save();
 
             var returnObj = {};
             if (!holding) {
@@ -126,11 +125,15 @@ router.post('/buy', (req, res) => {
                 newHolding.amount = req.body.amount;
                 newHolding.coin_id = req.body.coin_id;
                 newHolding.user_id = req.body.user_id;
-                newHolding.save();
+                newHolding.save().then(() => {
+                    this.user.save();
+                });
                 returnObj.holding = newHolding;
             } else {
                 holding.amount += req.body.amount;
-                holding.save();
+                holding.save().then(() => {
+                    this.user.save();
+                });
                 returnObj.holding = holding;
             }
             returnObj.balance = this.user.balance_usd;
@@ -176,7 +179,7 @@ router.post('/signin', (req, res) => {
     var username = req.body.username;
     var password = req.body.password;
 
-    if(!username || !password) {
+    if (!username || !password) {
         return res.status(400).send('Fill in all fields.');
     }
 
@@ -210,11 +213,11 @@ router.post('/signup', (req, res) => {
     var password = req.body.password;
     var confirmPassword = req.body.confirmPassword;
 
-    if(!username || !password || !confirmPassword) {
+    if (!username || !password || !confirmPassword) {
         return res.status(400).send('Fill in all fields.');
     }
 
-    if(password != confirmPassword) {
+    if (password != confirmPassword) {
         return res.status(401).send('Passwords does not match.');
     }
 
@@ -226,9 +229,9 @@ router.post('/signup', (req, res) => {
 
     newuser.save((err, savedUser) => {
         if (err) {
-            if(err.code == 11000)
+            if (err.code == 11000)
                 return res.status(402).send('User already exists.');
-            else 
+            else
                 return res.status(500).send();
         }
 
