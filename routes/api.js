@@ -3,7 +3,9 @@ var router = express.Router();
 
 var mongoose = require('mongoose');
 var ObjectId = require('mongoose').Types.ObjectId;
-mongoose.connect('mongodb://root:root@localhost:4001/test', {
+
+var mongoUri = process.env.MONGODB_URI || 'mongodb://root:root@localhost:4001/test';
+mongoose.connect(mongoUri, {
     useMongoClient: true
 });
 
