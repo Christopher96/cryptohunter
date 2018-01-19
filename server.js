@@ -8,7 +8,7 @@ var port = process.env.PORT || 4000;
 var app = express();
 
 var prod = process.env.PROD || false;
-if (prod) {
+if (!prod) {
     app.use(require('morgan')('dev'));
 }
 
