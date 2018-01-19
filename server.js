@@ -1,14 +1,16 @@
 var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
-var morgan = require('morgan');
 
 var api = require('./routes/api');
 
-var port = 4000;
+var port = process.env.PORT || 4000;
 var app = express();
 
-app.use(morgan('dev'));
+var prod = process.env.PROD || false;
+if (prod) {
+    app.use(require('morgan')('dev'));
+}
 
 // Body parser middleware
 app.use(bodyParser.json());
