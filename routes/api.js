@@ -6,7 +6,22 @@ var ObjectId = require('mongoose').Types.ObjectId;
 
 var mongoUri = process.env.MONGODB_URI || 'mongodb://root:root@localhost:4001/test';
 mongoose.connect(mongoUri, {
-    useMongoClient: true
+    useMongoClient: true,
+    replset: {
+        auto_reconnect: false,
+        poolSize: 10,
+        socketOptions: {
+            keepAlive: 1000,
+            connectTimeoutMS: 30000
+        }
+    },
+    server: {
+        poolSize: 5,
+        socketOptions: {
+            keepAlive: 1000,
+            connectTimeoutMS: 30000
+        }
+    }
 });
 
 var db = mongoose.connection;
