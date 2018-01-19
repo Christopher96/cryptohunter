@@ -4,8 +4,6 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var ObjectId = require('mongoose').Types.ObjectId;
 
-process.env.MONGODB_URI = "mongodb://root:rccJ3oDjROhE7bBw@cluster0-shard-00-00-s3vfd.mongodb.net:27017,cluster0-shard-00-01-s3vfd.mongodb.net:27017,cluster0-shard-00-02-s3vfd.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin";
-
 var mongoUri = process.env.MONGODB_URI || 'mongodb://root:root@localhost:4001/test';
 mongoose.connect(mongoUri, {
     useMongoClient: true
