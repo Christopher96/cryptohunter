@@ -1,9 +1,16 @@
+/*
+ * Backend API, communicates with MongoDB and uses express router for requests
+ */
+
+// Gets express router
 var express = require('express');
 var router = express.Router();
 
+// Gets mongoose plugin
 var mongoose = require('mongoose');
 var ObjectId = require('mongoose').Types.ObjectId;
 
+// Connects to MongoDB through public database URI or local database
 var mongoUri = process.env.MONGODB_URI || 'mongodb://root:root@localhost:4001/test';
 mongoose.connect(mongoUri, {
     useMongoClient: true
@@ -21,20 +28,11 @@ var path = require('path');
 var appRoot = path.dirname(require.main.filename);
 var tickerURL = 'https://api.coinmarketcap.com/v1/ticker';
 
-// Schemas
+// Mongoose schemas
 var User = require(appRoot + '/lib/User');
 var Holding = require(appRoot + '/lib/Holding');
-//
-// var newholding = {
-//     user_id: '123',
-//     coin_id: 'bitcoin',
-//     holding: '1.5'
-// }
 
-// var holding = new Holding(newholding);
-// holding.save();
-
-
+// Gets a user with given user_id
 getUser = (user_id) => {
     return new Promise((resolve, reject) => {
         User.findOne({
@@ -49,6 +47,7 @@ getUser = (user_id) => {
     });
 }
 
+// Gets a coin from 3rd part API with given coin_id
 getCoin = (coin_id) => {
     return new Promise((resolve, reject) => {
         request({
@@ -64,6 +63,7 @@ getCoin = (coin_id) => {
     });
 }
 
+// Initializes a trade requests with given user_id, amount and coin_id
 initTrade = (req, res) => {
     return getUser(req.body.user_id).then((user) => {
         this.user = user;
@@ -83,6 +83,7 @@ initTrade = (req, res) => {
     });
 }
 
+// Gets all the coins from 3rd part API
 router.get('/coins', (req, res, next) => {
     request({
         uri: tickerURL + '?limit=10',
@@ -97,6 +98,7 @@ router.get('/coins', (req, res, next) => {
     });
 });
 
+// Gets all the holdings from given user_id
 router.post('/holdings', (req, res, next) => {
     if (req.body.user_id) {
         Holding.find({ "user_id": req.body.user_id }, (err, holdings) => {
@@ -112,6 +114,7 @@ router.post('/holdings', (req, res, next) => {
     }
 });
 
+// Buy request, decrements balance and creates a new holding if there is none
 router.post('/buy', (req, res) => {
     if (!req.body.coin_id || !req.body.user_id || !req.body.amount) {
         res.status(500).send();
@@ -146,7 +149,7 @@ router.post('/buy', (req, res) => {
     });
 });
 
-
+// Sell request, increments balance and deletes holding if no amount left
 router.post('/sell', (req, res) => {
     if (req.body.coin_id, req.body.user_id && req.body.amount) {
         initTrade(req, res).then((holding) => {
@@ -177,6 +180,7 @@ router.post('/sell', (req, res) => {
     }
 });
 
+// Signs the user in and checks for username and password, sends back error messages if invalid
 router.post('/signin', (req, res) => {
     var username = req.body.username;
     var password = req.body.password;
@@ -210,6 +214,7 @@ router.post('/signin', (req, res) => {
     });
 })
 
+// Signs up a new user and checks if user exists already, sends back error messages if invalid
 router.post('/signup', (req, res) => {
     var username = req.body.username;
     var password = req.body.password;
@@ -241,5 +246,5 @@ router.post('/signup', (req, res) => {
     })
 });
 
-
+// Returns the router
 module.exports = router;

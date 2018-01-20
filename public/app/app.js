@@ -1,3 +1,6 @@
+/*
+ * Main file for initializing application
+ */
 angular.module('myapp', ['appRoutes', 'userCtrl', 'userService'])
     .filter('nComma', function() {
         return function(x) {

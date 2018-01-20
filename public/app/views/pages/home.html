@@ -1,3 +1,4 @@
+<!-- Modal dialog for buying and selling coins -->
 <div class="modal fade" id="trade_modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -9,9 +10,10 @@
                     <span class="text-right" ng-class="modal.coin.percent_change_24h > 0 ? 'text-success' : 'text-danger'">{{modal.coin.percent_change_24h}}%</span>
                 </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-            </div>
+                  <span aria-hidden="true">&times;</span>
+                </button>
+            </div> <!-- /.modal-header -->
+
             <div class="modal-body">
                 <span>Balance: ${{user.balance_usd | nComma}}</span><br/>
                 <span>Holdings: {{modal.holding.amount || 0}} {{modal.coin.symbol}}</span><br/>
@@ -24,12 +26,16 @@
                     <span ng-show="!isTrading">{{(isSelling) ? "Sell" : "Buy"}}</span>
                     <span ng-show="isTrading"><i class="fa fa-circle-o-notch fa-spin"></i></span>
                 </button>
-            </div>
-        </div>
-    </div>
-</div>
+            </div> <!-- /.modal-body -->
+
+        </div> <!-- /.modal-content -->
+    </div> <!-- /.modal-dialog -->
+</div> <!-- /.modal -->
+
+<!-- Main container -->
 <div class="container mt-4">
-    <div class="row box">
+    <!-- Header with logo, balance and signout -->
+    <div class="header row box">
         <div class="col-5">
             <h1>
                 <img id="logo" src="app/img/logo.png" alt="logo">
@@ -50,8 +56,9 @@
             <div class="row"><span>Last logged in: 2017-01-01</span></div>
             <div class="row"><a href="/signout" id="logout" class="btn btn-primary">Sign out</a></div>
         </div>
-    </div>
+    </div> <!-- /.header -->
 
+    <!-- User portfolio, lists of all holdings -->
     <div class="portfolio list">
         <hr>
         <h3>Portfolio</h3>
@@ -75,7 +82,9 @@
                 <button class="btn btn-danger" ng-click="tradeCoin(holding.coin, true)" data-toggle="modal" data-target="#trade_modal">Sell</button>
             </div>
         </div>
-    </div>
+    </div> <!-- /.portfolio -->
+
+    <!-- List of all available coins for purchase -->
     <div class="currencies list">
         <hr>
         <h3>Coins</h3>
@@ -101,5 +110,5 @@
                 <button class="btn btn-success" ng-click="tradeCoin(coin)" data-toggle="modal" data-target="#trade_modal">Buy</button>
             </div>
         </div>
-    </div>
-</div>
+    </div> <!-- /.currencies -->
+</div> <!-- /.container -->

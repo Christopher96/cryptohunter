@@ -1,8 +1,22 @@
+/*
+ * Global SCSS stylesheet, all styling goes here, requires running Gulp server
+ */
+
+/*
+ * IMPORTS
+ */
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "node_modules/font-awesome/scss/font-awesome";
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
+
+/*
+ * FONTS
+ */
 $main_font: 'Quicksand';
-// $alt_font: 'Electrolize';
+
+/*
+ * ELEMENTS
+ */
 body {
     font-family: $main_font;
 }
@@ -15,41 +29,12 @@ form {
     }
 }
 
+/*
+ * IDS
+ */
 #logo {
     width: 100%;
     margin-left: -20px;
-}
-
-.box {
-    padding: 10px;
-    border-radius: 10px;
-}
-
-.list {
-    padding-top: 20px;
-}
-
-.list-element {
-    padding-top: 10px;
-    button {
-        text-transform: uppercase;
-    }
-}
-
-.header-balance {
-    font-size: 1.8em;
-    // font-family: $alt_font;
-}
-
-.header-info {
-    span {
-        width: 100%;
-        text-align: right;
-    }
-    button {
-        margin-left: auto;
-        margin-right: 0;
-    }
 }
 
 #logout {
@@ -117,3 +102,38 @@ form {
         color: inherit;
     }
 }
+
+/*
+ * CLASSES
+ */
+.box {
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.list {
+    padding-top: 20px;
+}
+
+.list-element {
+    padding-top: 10px;
+    button {
+        text-transform: uppercase;
+    }
+}
+
+.header-balance {
+    font-size: 1.8em;
+}
+
+.header-info {
+    span {
+        width: 100%;
+        text-align: right;
+    }
+    button {
+        margin-left: auto;
+        margin-right: 0;
+    }
+}
+

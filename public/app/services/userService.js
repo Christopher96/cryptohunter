@@ -1,10 +1,15 @@
+/*
+ * API service for user, contains sign in, signup and session management
+ */
 angular.module('userService', [])
     .service('apiService', function($window, $http) {
 
+        // Sets a user to localstorage
         this.setUser = (user) => {
             return $window.localStorage.setItem('user', JSON.stringify(user));
         }
-
+        
+        // Gets the user from localstorage
         this.getUser = () => {
             try {
                 return JSON.parse($window.localStorage.getItem('user'));
@@ -13,6 +18,7 @@ angular.module('userService', [])
             }
         }
 
+        // Signs the user in with the API
         this.signIn = (username, password) => {
             return new Promise((resolve, reject) => {
                 this.post('/api/signin', {
@@ -31,6 +37,7 @@ angular.module('userService', [])
             });
         }
 
+        // Signs up the user with the API
         this.signUp = (username, password, confirmPassword) => {
             return new Promise((resolve, reject) => {
                 this.post('/api/signup', {
@@ -50,6 +57,7 @@ angular.module('userService', [])
             });
         }
 
+        // Helper function for API posts
         this.post = (action, data = {}) => {
             if (this.getUser()) {
                 data.user_id = this.getUser()._id;

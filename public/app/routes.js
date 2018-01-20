@@ -1,3 +1,6 @@
+/*
+ * Angular routing provider for frontend routes
+ */
 angular.module('appRoutes', ['ngRoute'])
 .config(function($routeProvider, $locationProvider){
     $routeProvider

@@ -1,3 +1,8 @@
+/* 
+ * Gulpfile for starting dev server
+ */
+
+// Gets required plugins
 var gulp = require('gulp');
 var gulpLoadPlugins = require('gulp-load-plugins');
 var browserSync = require('browser-sync').create();
@@ -6,29 +11,29 @@ var nodemon = require('gulp-nodemon');
 var $ = gulpLoadPlugins();
 var reload = browserSync.reload;
 
-// we'd need a slight delay to reload browsers
-// connected to browser-sync after restarting nodemon
+// Slight delay after restarting nodemon
 var BROWSER_SYNC_RELOAD_DELAY = 500;
 
+// Nodemon gulp task, starts server and file watch
 gulp.task('nodemon', function(cb) {
     var called = false;
     return nodemon({
-            // nodemon our expressjs server
+            // Nodemon our expressjs server
             script: 'server.js',
 
-            // watch core server file(s) that require server restart on change
+            // Watch core server file(s) that require server restart on change
             watch: [
                 'server.js',
                 'routes/**/*.js'
             ]
         })
         .on('start', function onStart() {
-            // ensure start only got called once
+            // Ensure start only got called once
             if (!called) { cb(); }
             called = true;
         })
         .on('restart', function onRestart() {
-            // reload connected browsers after a slight delay
+            // Reload connected browsers after a slight delay
             setTimeout(function() {
                 reload({
                     stream: false
@@ -37,7 +42,7 @@ gulp.task('nodemon', function(cb) {
         });
 });
 
-
+// Serves up browser-sync and nodemon on port 4000 and watches for html, scss and js changes
 gulp.task('serve', ['nodemon'], () => {
     browserSync.init({
         proxy: 'localhost:4000',
@@ -53,6 +58,7 @@ gulp.task('serve', ['nodemon'], () => {
     ]).on('change', reload);
 });
 
+// Task for compiling SCSS to main CSS stylesheet
 gulp.task('styles', () => {
     gulp.src('public/app/scss/*.scss')
         .pipe($.sass.sync({
