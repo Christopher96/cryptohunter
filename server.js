@@ -1,5 +1,5 @@
 /*
- * Main file for starting backend server
+ * Main file for starting server
  */
 
 // Gets required plugins

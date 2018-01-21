@@ -12,7 +12,8 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
-            </div> <!-- /.modal-header -->
+            </div>
+            <!-- /.modal-header -->
 
             <div class="modal-body">
                 <span>Balance: ${{user.balance_usd | nComma}}</span><br/>
@@ -26,11 +27,15 @@
                     <span ng-show="!isTrading">{{(isSelling) ? "Sell" : "Buy"}}</span>
                     <span ng-show="isTrading"><i class="fa fa-circle-o-notch fa-spin"></i></span>
                 </button>
-            </div> <!-- /.modal-body -->
+            </div>
+            <!-- /.modal-body -->
 
-        </div> <!-- /.modal-content -->
-    </div> <!-- /.modal-dialog -->
-</div> <!-- /.modal -->
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 <!-- Main container -->
 <div class="container mt-4">
@@ -53,10 +58,11 @@
         </div>
         <div class="col-3 header-info">
             <div class="row"><span>Logged in as: {{user.username}}</span></div>
-            <div class="row"><span>Last logged in: 2017-01-01</span></div>
+            <div class="row"><span>Last logged in: {{user.last_signin}}</span></div>
             <div class="row"><a href="/signout" id="logout" class="btn btn-primary">Sign out</a></div>
         </div>
-    </div> <!-- /.header -->
+    </div>
+    <!-- /.header -->
 
     <!-- User portfolio, lists of all holdings -->
     <div class="portfolio list">
@@ -82,7 +88,8 @@
                 <button class="btn btn-danger" ng-click="tradeCoin(holding.coin, true)" data-toggle="modal" data-target="#trade_modal">Sell</button>
             </div>
         </div>
-    </div> <!-- /.portfolio -->
+    </div>
+    <!-- /.portfolio -->
 
     <!-- List of all available coins for purchase -->
     <div class="currencies list">
@@ -110,5 +117,7 @@
                 <button class="btn btn-success" ng-click="tradeCoin(coin)" data-toggle="modal" data-target="#trade_modal">Buy</button>
             </div>
         </div>
-    </div> <!-- /.currencies -->
-</div> <!-- /.container -->
+    </div>
+    <!-- /.currencies -->
+</div>
+<!-- /.container -->

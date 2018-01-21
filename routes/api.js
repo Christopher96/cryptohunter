@@ -11,7 +11,7 @@ var mongoose = require('mongoose');
 var ObjectId = require('mongoose').Types.ObjectId;
 
 // Connects to MongoDB through public database URI or local database
-var mongoUri = process.env.MONGODB_URI || 'mongodb://root:root@localhost:4001/test';
+var mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:4001/cryptohunter';
 mongoose.connect(mongoUri, {
     useMongoClient: true
 });
@@ -24,6 +24,7 @@ db.on('error', function(err) {
 
 var request = require('request');
 var path = require('path');
+var dateFormat = require('dateformat');
 
 var appRoot = path.dirname(require.main.filename);
 var tickerURL = 'https://api.coinmarketcap.com/v1/ticker';
@@ -202,7 +203,7 @@ router.post('/signin', (req, res) => {
             return res.status(404).send('Wrong username or password.');
         }
 
-        user.last_signin = Date.now();
+        user.last_signin = getDate();
         user.save((err, savedUser) => {
             if (err) {
                 console.log(err);
@@ -233,6 +234,7 @@ router.post('/signup', (req, res) => {
     newuser.password = password;
     newuser.balance_usd = 1000;
     newuser.networth_usd = 0;
+    newuser.last_signin = getDate();
 
     newuser.save((err, savedUser) => {
         if (err) {
@@ -245,6 +247,11 @@ router.post('/signup', (req, res) => {
         return res.status(200).send(newuser);
     })
 });
+
+function getDate() {
+    var date = new Date();
+    return dateFormat(date, "yyyy-mm-dd, h:MM TT");
+}
 
 // Returns the router
 module.exports = router;
